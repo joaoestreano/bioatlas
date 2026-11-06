@@ -19,7 +19,7 @@ pids
 lib-cov
 
 # Coverage directory used by tools like istanbul
-coverage
+coverage/
 *.lcov
 
 # nyc test coverage
@@ -37,12 +37,14 @@ bower_components
 # Compiled binary addons (https://nodejs.org/api/addons.html)
 build/Release
 
-# Dependency directories
+# Dependencies
 node_modules/
 jspm_packages/
-
-# Snowpack dependency directory (https://snowpack.dev/)
 web_modules/
+
+# Build Output
+dist/
+build/
 
 # TypeScript cache
 *.tsbuildinfo
@@ -65,7 +67,7 @@ web_modules/
 # Yarn Integrity file
 .yarn-integrity
 
-# dotenv environment variable files
+# Environment variables
 .env
 .env.*
 !.env.example
@@ -80,7 +82,6 @@ out
 
 # Nuxt.js build / generate output
 .nuxt
-dist
 .output
 
 # Gatsby files
@@ -148,11 +149,10 @@ vite.config.ts.timestamp-*
 # Turbo Repo
 .turbo
 
-node_modules/
-dist/
-build/
-.env
-.env.*
-!.env.example
-coverage/
+# Editor
+.vscode/
+.idea/
+
+# System
 .DS_Store
+Thumbs.db
