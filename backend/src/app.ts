@@ -1,6 +1,7 @@
 import { prisma } from './config/database.js'
 import express from 'express'
 import cors from 'cors'
+import speciesRoutes from './routes/species.routes.js'
 
 const app = express()
 
@@ -9,6 +10,8 @@ app.use(cors({
 }))
 
 app.use(express.json())
+
+app.use('/api/species', speciesRoutes)
 
 app.get('/api/health', (_req, res) => {
   return res.status(200).json({
