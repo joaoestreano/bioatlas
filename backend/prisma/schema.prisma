@@ -1,0 +1,171 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Categorias de organismos
+enum SpeciesCategory {
+  ANIMAL
+  PLANT
+  FUNGI
+  OTHER
+}
+
+// Tipos de mídia
+enum MediaType {
+  PHOTO
+  ILLUSTRATION
+  FOSSIL
+  OTHER
+}
+
+// Tipos de medidas
+enum MeasurementType {
+  WEIGHT
+  LENGTH
+  HEIGHT
+  WINGSPAN
+  LIFESPAN
+}
+
+// Tipos de distribuição
+enum DistributionType {
+  NATIVE
+  INTRODUCED
+  EXTINCT_RANGE
+  UNKNOWN
+}
+
+model Species {
+  id                 String          @id @default(uuid())
+  scientificName     String          @unique
+  commonName         String?
+  category           SpeciesCategory
+  description        String?         @db.Text
+  extinct            Boolean         @default(false)
+  conservationStatus String?
+  taxonId            String?
+
+  taxonomy      Taxonomy?       @relation(fields: [taxonId], references: [id])
+  measurements  Measurement[]
+  media         SpeciesMedia[]
+  sources       SpeciesSource[]
+  distributions Distribution[]
+  occurrences   Occurrence[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([category])
+  @@index([extinct])
+  @@index([commonName])
+}
+
+model Taxonomy {
+  id             String  @id @default(uuid())
+  scientificName String
+  rank           String
+  externalId     String?
+  provider       String?
+
+  parentId String?
+  parent   Taxonomy?  @relation("TaxonomyTree", fields: [parentId], references: [id])
+  children Taxonomy[] @relation("TaxonomyTree")
+
+  species Species[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([scientificName])
+  @@index([rank])
+  @@index([parentId])
+}
+
+model Measurement {
+  id        String          @id @default(uuid())
+  speciesId String
+  type      MeasurementType
+  minimum   Float?
+  maximum   Float?
+  average   Float?
+  unit      String
+  notes     String?         @db.Text
+
+  species Species @relation(fields: [speciesId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([speciesId])
+  @@index([type])
+}
+
+model SpeciesMedia {
+  id          String    @id @default(uuid())
+  speciesId   String
+  url         String
+  thumbnail   String?
+  type        MediaType
+  license     String?
+  author      String?
+  attribution String?
+  sourceUrl   String?
+
+  species Species @relation(fields: [speciesId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([speciesId])
+}
+
+model SpeciesSource {
+  id          String   @id @default(uuid())
+  speciesId   String
+  provider    String
+  externalId  String
+  sourceUrl   String?
+  retrievedAt DateTime @default(now())
+
+  species Species @relation(fields: [speciesId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, externalId])
+  @@index([speciesId])
+}
+
+model Distribution {
+  id          String           @id @default(uuid())
+  speciesId   String
+  region      String
+  countryCode String?
+  type        DistributionType @default(UNKNOWN)
+  description String?          @db.Text
+
+  species Species @relation(fields: [speciesId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([speciesId])
+  @@index([countryCode])
+}
+
+model Occurrence {
+  id         String    @id @default(uuid())
+  speciesId  String
+  latitude   Float
+  longitude  Float
+  eventDate  DateTime?
+  locality   String?
+  source     String?
+  externalId String?
+
+  species Species @relation(fields: [speciesId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([speciesId])
+  @@index([latitude, longitude])
+}

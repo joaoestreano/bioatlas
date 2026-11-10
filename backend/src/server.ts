@@ -1,12 +1,9 @@
-
-import dotenv from 'dotenv'
-import app from './app'
-
-dotenv.config()
+import 'dotenv/config'
+import app from './app.js'
 
 const PORT = Number(process.env.PORT) || 3000
 
 app.listen(PORT, () => {
   console.log(`BioAtlas API executando na porta ${PORT}`)
-  console.log(`http://localhost:${PORT}/api/health`)
+  console.log(`Ambiente: ${process.env.NODE_ENV || 'development'}`)
 })

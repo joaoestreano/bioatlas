@@ -1,4 +1,4 @@
-
+import { prisma } from './config/database.js'
 import express from 'express'
 import cors from 'cors'
 
@@ -16,6 +16,34 @@ app.get('/api/health', (_req, res) => {
     message: 'BioAtlas API funcionando!',
     timestamp: new Date().toISOString()
   })
+})
+
+app.get('/', (_req, res) => {
+  return res.json({
+    name: 'BioAtlas API',
+    version: '1.0.0',
+    message: 'API do BioAtlas funcionando!',
+  })
+})
+
+app.get('/api/database/health', async (_req, res) => {
+  try {
+    const speciesCount = await prisma.species.count()
+
+    return res.status(200).json({
+      success: true,
+      message: 'Banco de dados conectado!',
+      database: 'PostgreSQL',
+      speciesCount,
+    })
+  } catch (error) {
+    console.error('Erro ao conectar ao banco de dados:', error)
+
+    return res.status(500).json({
+      success: false,
+      message: 'Não foi possível conectar ao banco de dados.',
+    })
+  }
 })
 
 export default app

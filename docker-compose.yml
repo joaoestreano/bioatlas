@@ -1,0 +1,26 @@
+
+services:
+  database:
+    image: postgis/postgis:17-3.5
+    container_name: bioatlas_database
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_USER: bioatlas
+      POSTGRES_PASSWORD: BioAtlas_DB_2026!
+      POSTGRES_DB: bioatlas_db
+
+    ports:
+      - "5433:5432"
+
+    volumes:
+      - bioatlas_data:/var/lib/postgresql/data
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bioatlas -d bioatlas_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  bioatlas_data:
